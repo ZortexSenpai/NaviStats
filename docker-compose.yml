@@ -1,16 +1,14 @@
 services:
   navistats:
     container_name: navistats
-    build: .
+    image: ghcr.io/zortexsenpai/navistats:latest
     ports:
       - "3000:80"
     restart: unless-stopped
-    # Mount a custom config.json to override genre groups (and future settings).
-    # The file is fetched at runtime, so no rebuild needed after changes.
-    # volumes:
-    #   - ./config.json:/usr/share/nginx/html/config.json:ro
-    
-    # Add these labels if you plan to use Traefik as the 
+    volumes:
+      - ./config.json:/usr/share/nginx/html/config.json:ro
+
+    # Add these labels if you plan to use Traefik as the reverse proxy:
     #labels:
     #  - "traefik.enable=true"
     #  - "traefik.http.routers.navistats.rule=Host(`navistats.example.com`)"
