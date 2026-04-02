@@ -28,6 +28,14 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 - **Genre grouping** — map sub-genres to parent groups via `config.json` (e.g. Liquid DNB → Drum and Bass)
 - **Configurable default timespan** — set the initial timespan via `config.json`
 
+### Special page
+
+Accessible via the **Special** tab in the header (loads your complete listening history — a one-time confirmation is shown on first visit).
+
+- **Listening Pace** — line chart of play counts over time with a Day / Week / Month / Year interval toggle; only the actual data range is displayed (no forced empty padding)
+- **On This Day** — tracks you listened to exactly 1, 2, and 3 years ago today
+- **Artist Loyalty Score** — ranked list of how consistently you return to each artist across months; score = percentage of months in your history that contain at least one play of that artist
+
 ---
 
 ## Example Screenshots
