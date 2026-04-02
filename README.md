@@ -2,7 +2,7 @@
 
 A self-hosted listening statistics dashboard for [Navidrome](https://www.navidrome.org/). NaviStats connects directly to your Navidrome server and gives you a visual breakdown of your music listening history.
 
-# This Project is purely vibecoded, so use at your own risk (Yes even the ReadMe.md lol)
+# This Project is purely vibecoded, so use at your own risk (Yes even the ReadMe.md for the most part)
 
 Claude-Code: "All processing happens client-side — your credentials never leave your browser."
 
@@ -27,6 +27,15 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 - **Configurable default timespan** — set the initial timespan via `config.json`
 
 ---
+
+## Screenshots
+<img width="2252" height="1318" alt="image" src="https://github.com/user-attachments/assets/75b1c0e3-d7d2-488d-964d-c6cbb1533fd1" />
+<img width="2252" height="831" alt="image" src="https://github.com/user-attachments/assets/28c112fc-3bac-4fb8-8ea3-2ec06eec5668" />
+<img width="2252" height="907" alt="image" src="https://github.com/user-attachments/assets/ea8d2be0-eaa6-4ccf-862e-64701c3decd1" />
+<img width="2252" height="1317" alt="image" src="https://github.com/user-attachments/assets/19acfa5b-ab6d-40fa-bcf9-9ae97c6ced45" />
+
+
+
 
 ## Quickstart
 
