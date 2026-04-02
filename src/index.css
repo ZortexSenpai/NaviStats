@@ -403,6 +403,12 @@ body {
   border-color: var(--accent);
 }
 
+.top-sessions-total {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* ─── Stat Card ──────────────────────────────────── */
 
 .stat-value {

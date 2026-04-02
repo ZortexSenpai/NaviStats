@@ -19,6 +19,7 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 - **Recent Tracks** — latest plays in chronological order
 - **Top Genres** — breakdown of genres listened to, with optional grouping
 - **Top Decades** — distribution of plays by release decade
+- **Top Sessions** — ranked list of your longest listening sessions, with track count and relative duration bars
 - **Recently Listened** — quick summary card of recent activity
 - **Unique Tracks** — count of distinct tracks played in the period
 - **Timespan picker** — preset spans (1d / 7d / 30d / 1y) or a custom date range with an Apply button

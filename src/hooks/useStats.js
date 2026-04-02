@@ -43,7 +43,7 @@ function inTZ(date, tz) {
 
 function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null) {
   if (!songs.length) {
-    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [] }
+    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [], sessions: [] }
   }
 
   const totalDuration = songs.reduce((sum, s) => sum + (s.duration || 0), 0)
@@ -220,7 +220,34 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
   })
   const decades = Object.values(decadeMap).sort((a, b) => a.decade - b.decade)
 
-  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades }
+  // ── Sessions ────────────────────────────────────────────────────
+  // A session is a continuous block of listening; a gap > 20 min = new session.
+  const SESSION_GAP_MS = 20 * 60 * 1000
+  const sortedAsc = songs.slice().sort((a, b) => new Date(a.playDate) - new Date(b.playDate))
+  const sessionList = []
+  let cur = null
+  for (const s of sortedAsc) {
+    const startMs = new Date(s.playDate).getTime()
+    const durMs = (s.duration || 0) * 1000
+    const endMs = startMs + durMs
+    if (!cur) {
+      cur = { start: startMs, end: endMs, duration: s.duration || 0, trackCount: 1 }
+    } else {
+      const gap = startMs - cur.end
+      if (gap <= SESSION_GAP_MS) {
+        cur.end = Math.max(cur.end, endMs)
+        cur.duration += s.duration || 0
+        cur.trackCount++
+      } else {
+        sessionList.push(cur)
+        cur = { start: startMs, end: endMs, duration: s.duration || 0, trackCount: 1 }
+      }
+    }
+  }
+  if (cur) sessionList.push(cur)
+  const sessions = sessionList.sort((a, b) => b.duration - a.duration)
+
+  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades, sessions }
 }
 
 // span: { days: number, startDate?: Date, endDate?: Date }

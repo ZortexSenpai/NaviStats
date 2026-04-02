@@ -9,6 +9,7 @@ import RecentTracks from './RecentTracks'
 import TopTracks from './TopTracks'
 import TopDecades from './TopDecades'
 import ThemeSelector from './ThemeSelector'
+import TopSessions from './TopSessions'
 import { useStats } from '../hooks/useStats'
 import { useConfig } from '../hooks/useConfig'
 import { useThemeContext } from '../ThemeContext'
@@ -104,6 +105,10 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
             </div>
             <div className="col-6">
               <RecentTracks recentTracks={data.recentTracks} auth={auth} />
+            </div>
+
+            <div className="col-12">
+              <TopSessions sessions={data.sessions} />
             </div>
           </div>
         )}
