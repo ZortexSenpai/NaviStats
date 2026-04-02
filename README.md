@@ -110,6 +110,8 @@ If you want a more complete genre grouping use the config from `public/config.js
 {
   "defaultTimespan": 7,
   "defaultTheme": "navistats",
+  "timezone": "Europe/Zurich",
+  "recentTracksRefreshInterval": 20,
   "genreGroups": {
     "Drum and Bass": ["DNB", "Liquid DNB", "Neurofunk", "Jump Up"],
     "Dubstep": ["Dubstep", "Riddim", "Brostep", "Tearout"],
