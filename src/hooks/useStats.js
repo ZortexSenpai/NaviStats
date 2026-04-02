@@ -41,9 +41,9 @@ function inTZ(date, tz) {
   return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
 }
 
-function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null) {
+function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null, recentTracksGenreGrouping = true) {
   if (!songs.length) {
-    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [] }
+    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [], decades: [], years: [], sessions: [] }
   }
 
   const totalDuration = songs.reduce((sum, s) => sum + (s.duration || 0), 0)
@@ -190,6 +190,7 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
     albumId: s.albumId,
     playDate: s.playDate,
     duration: s.duration || 0,
+    genres: [...new Set(songGenres(s, recentTracksGenreGrouping ? genreGroupMap : {}))],
   }))
 
   // ── Top Tracks ─────────────────────────────────────────────────
@@ -214,47 +215,98 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
     if (!s.year || s.year <= 0) return
     const decade = Math.floor(s.year / 10) * 10
     const label = decade < 2000 ? `${decade % 100}s` : `${decade}s`
-    if (!decadeMap[decade]) decadeMap[decade] = { decade, label, count: 0, duration: 0 }
+    if (!decadeMap[decade]) decadeMap[decade] = { decade, label, count: 0, duration: 0, albumCounts: {} }
     decadeMap[decade].count++
     decadeMap[decade].duration += s.duration || 0
+    const aKey = s.albumId || s.album || 'unknown'
+    if (!decadeMap[decade].albumCounts[aKey]) decadeMap[decade].albumCounts[aKey] = { name: s.album || 'Unknown', count: 0 }
+    decadeMap[decade].albumCounts[aKey].count++
   })
-  const decades = Object.values(decadeMap).sort((a, b) => a.decade - b.decade)
+  const decades = Object.values(decadeMap).sort((a, b) => a.decade - b.decade).map(d => ({
+    decade: d.decade, label: d.label, count: d.count, duration: d.duration,
+    topAlbums: Object.values(d.albumCounts).sort((a, b) => b.count - a.count).slice(0, 3),
+  }))
 
-  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades }
+  // ── Years ──────────────────────────────────────────────────────
+  const yearMap = {}
+  songs.forEach(s => {
+    if (!s.year || s.year <= 0) return
+    const y = s.year
+    if (!yearMap[y]) yearMap[y] = { year: y, label: String(y), count: 0, duration: 0, albumCounts: {} }
+    yearMap[y].count++
+    yearMap[y].duration += s.duration || 0
+    const aKey = s.albumId || s.album || 'unknown'
+    if (!yearMap[y].albumCounts[aKey]) yearMap[y].albumCounts[aKey] = { name: s.album || 'Unknown', count: 0 }
+    yearMap[y].albumCounts[aKey].count++
+  })
+  const years = Object.values(yearMap).sort((a, b) => a.year - b.year).map(y => ({
+    year: y.year, label: y.label, count: y.count, duration: y.duration,
+    topAlbums: Object.values(y.albumCounts).sort((a, b) => b.count - a.count).slice(0, 3),
+  }))
+
+  // ── Sessions ────────────────────────────────────────────────────
+  // A session is a continuous block of listening; a gap > 20 min = new session.
+  const SESSION_GAP_MS = 20 * 60 * 1000
+  const sortedAsc = songs.slice().sort((a, b) => new Date(a.playDate) - new Date(b.playDate))
+  const sessionList = []
+  let cur = null
+  for (const s of sortedAsc) {
+    const startMs = new Date(s.playDate).getTime()
+    const durMs = (s.duration || 0) * 1000
+    const endMs = startMs + durMs
+    if (!cur) {
+      cur = { start: startMs, end: endMs, duration: s.duration || 0, trackCount: 1 }
+    } else {
+      const gap = startMs - cur.end
+      if (gap <= SESSION_GAP_MS) {
+        cur.end = Math.max(cur.end, endMs)
+        cur.duration += s.duration || 0
+        cur.trackCount++
+      } else {
+        sessionList.push(cur)
+        cur = { start: startMs, end: endMs, duration: s.duration || 0, trackCount: 1 }
+      }
+    }
+  }
+  if (cur) sessionList.push(cur)
+  const sessions = sessionList.sort((a, b) => b.duration - a.duration)
+
+  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades, years, sessions }
 }
 
 // span: { days: number, startDate?: Date, endDate?: Date }
-export function useStats(auth, span, genreGroups = {}, timezone = null) {
+export function useStats(auth, span, genreGroups = {}, timezone = null, recentTracksGenreGrouping = true) {
   const [raw, setRaw] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     if (!auth || !span) return
+    if (!silent) setRaw(null)
     setLoading(true)
     setError(null)
     try {
       const endDate = span.endDate ?? new Date()
-      const startDate = span.startDate ?? subDays(endDate, span.days)
+      const startDate = span.all ? new Date(0) : (span.startDate ?? subDays(endDate, span.days))
       const songs = await fetchSongsInRange(auth.serverUrl, auth.token, startDate)
       // fetchSongsInRange stops at startDate but doesn't skip songs after endDate.
       // For custom ranges (endDate in the past) we must filter the leading songs out.
       const filtered = songs.filter(s => new Date(s.playDate) <= endDate)
-      setRaw({ songs: filtered, startDate, endDate, days: span.days })
+      setRaw({ songs: filtered, startDate, endDate, days: span.all ? Infinity : span.days })
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [auth, span?.days, span?.startDate, span?.endDate])
+  }, [auth, span?.days, span?.all, span?.startDate, span?.endDate])
 
   useEffect(() => { load() }, [load])
 
   // Re-process whenever raw data or genre groups change — no extra fetch needed
   const data = useMemo(() => {
     if (!raw) return null
-    return processStats(raw.songs, raw.startDate, raw.endDate, raw.days, genreGroups, timezone)
-  }, [raw, genreGroups, timezone])
+    return processStats(raw.songs, raw.startDate, raw.endDate, raw.days, genreGroups, timezone, recentTracksGenreGrouping)
+  }, [raw, genreGroups, timezone, recentTracksGenreGrouping])
 
-  return { data, loading, error, refetch: load }
+  return { data, loading, error, refetch: () => load(true) }
 }

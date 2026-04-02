@@ -57,6 +57,13 @@ export default function RecentTracks({ recentTracks, auth }) {
             <div className="track-info">
               <span className="track-title">{track.title}</span>
               <span className="track-meta">{track.artist}{track.album ? ` · ${track.album}` : ''}</span>
+              {track.genres && track.genres.length > 0 && (
+                <div className="track-genres">
+                  {track.genres.map(g => (
+                    <span className="track-genre-tag" key={g}>{g}</span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="track-right">
               <span className="track-duration">{fmtDuration(track.duration)}</span>

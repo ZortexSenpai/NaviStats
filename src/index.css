@@ -403,6 +403,42 @@ body {
   border-color: var(--accent);
 }
 
+.top-sessions-total {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 3px 10px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-toggle-btn:hover {
+  color: var(--text-primary);
+}
+
+.view-toggle-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
 /* ─── Stat Card ──────────────────────────────────── */
 
 .stat-value {
@@ -781,6 +817,23 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.track-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.track-genre-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
 }
 
 .track-right {

@@ -19,9 +19,11 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 - **Recent Tracks** — latest plays in chronological order
 - **Top Genres** — breakdown of genres listened to, with optional grouping
 - **Top Decades** — distribution of plays by release decade
+- **Top Sessions** — ranked list of your longest listening sessions, with track count and relative duration bars
 - **Recently Listened** — quick summary card of recent activity
 - **Unique Tracks** — count of distinct tracks played in the period
-- **Timespan picker** — preset spans (1d / 7d / 30d / 1y) or a custom date range with an Apply button
+- **Albums by Release** — bar chart of plays grouped by release decade or year, with a decade/year toggle and per-bucket top album tooltips
+- **Timespan picker** — preset spans (1d / 7d / 30d / 1y / All) or a custom date range with an Apply button; **All** fetches your entire listening history
 - **Theme selector** — multiple built-in colour themes
 - **Genre grouping** — map sub-genres to parent groups via `config.json` (e.g. Liquid DNB → Drum and Bass)
 - **Configurable default timespan** — set the initial timespan via `config.json`
@@ -97,6 +99,8 @@ NaviStats reads an optional `public/config.json` at startup. When running via Do
 | `defaultTimespan` | number | `30` | Initial timespan in days shown on load |
 | `defaultTheme` | string | `"navistats"` | Initial theme for new visitors (overridden by user's saved preference) |
 | `timezone` | string | `null` | IANA timezone for all date grouping (e.g. `"Europe/Amsterdam"`). `null` uses the browser's local timezone |
+| `recentTracksRefreshInterval` | number\|null | `null` | Auto-refresh interval in seconds (e.g. `30`). `null` disables auto-refresh |
+| `recentTracksGenreGrouping` | boolean | `true` | Whether to apply genre grouping to genres shown in Recent Tracks. `false` shows raw genre tags |
 | `genreGroups` | object | `{}` | Map of group name → array of sub-genre strings |
 
 Available theme IDs: `navistats`, `catppuccin-mocha`, `catppuccin-latte`, `dracula`, `nord`, `gruvbox`, `tokyo-night`, `one-dark`, `material-dark`
@@ -108,6 +112,9 @@ If you want a more complete genre grouping use the config from `public/config.js
 {
   "defaultTimespan": 7,
   "defaultTheme": "navistats",
+  "timezone": "Europe/Zurich",
+  "recentTracksRefreshInterval": 20,
+  "recentTracksGenreGrouping": false,
   "genreGroups": {
     "Drum and Bass": ["DNB", "Liquid DNB", "Neurofunk", "Jump Up"],
     "Dubstep": ["Dubstep", "Riddim", "Brostep", "Tearout"],

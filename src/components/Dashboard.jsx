@@ -9,6 +9,8 @@ import RecentTracks from './RecentTracks'
 import TopTracks from './TopTracks'
 import TopDecades from './TopDecades'
 import ThemeSelector from './ThemeSelector'
+import TopSessions from './TopSessions'
+import AlbumsByRelease from './AlbumsByRelease'
 import { useStats } from '../hooks/useStats'
 import { useConfig } from '../hooks/useConfig'
 import { useThemeContext } from '../ThemeContext'
@@ -23,8 +25,15 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       setSpan({ days: config.defaultTimespan || 30 })
     }
   }, [config.loaded])
-  const { data, loading, error, refetch } = useStats(auth, span, config.genreGroups, config.timezone)
+  const { data, loading, error, refetch } = useStats(auth, span, config.genreGroups, config.timezone, config.recentTracksGenreGrouping)
   const theme = useThemeContext()
+
+  useEffect(() => {
+    const interval = config.recentTracksRefreshInterval
+    if (!interval || interval <= 0) return
+    const id = setInterval(refetch, interval * 1000)
+    return () => clearInterval(id)
+  }, [config.recentTracksRefreshInterval, refetch])
 
   return (
     <div className="dashboard">
@@ -47,7 +56,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       <main className="main-content">
         {span && <SpanPicker span={span} onChange={setSpan} />}
 
-        {loading && (
+        {loading && !data && (
           <div className="loading-overlay">
             <div className="spinner" />
             <span>Fetching your listening data…</span>
@@ -62,7 +71,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
           </div>
         )}
 
-        {data && !loading && (
+        {data && (
           <div className="stats-grid">
             <div className="col-6">
               <RecentlyListened data={data} />
@@ -92,6 +101,10 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
               <TopDecades decades={data.decades} chartColors={theme.chart} />
             </div>
 
+            <div className="col-12">
+              <AlbumsByRelease decades={data.decades} years={data.years} chartColors={theme.chart} />
+            </div>
+
             <div className="col-6">
               <ArtistList topArtists={data.topArtists} auth={auth} />
             </div>
@@ -104,6 +117,10 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
             </div>
             <div className="col-6">
               <RecentTracks recentTracks={data.recentTracks} auth={auth} />
+            </div>
+
+            <div className="col-12">
+              <TopSessions sessions={data.sessions} />
             </div>
           </div>
         )}
