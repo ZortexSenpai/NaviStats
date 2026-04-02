@@ -43,7 +43,7 @@ function inTZ(date, tz) {
 
 function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null, recentTracksGenreGrouping = true) {
   if (!songs.length) {
-    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [], sessions: [] }
+    return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [], decades: [], years: [], sessions: [] }
   }
 
   const totalDuration = songs.reduce((sum, s) => sum + (s.duration || 0), 0)
@@ -215,11 +215,34 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
     if (!s.year || s.year <= 0) return
     const decade = Math.floor(s.year / 10) * 10
     const label = decade < 2000 ? `${decade % 100}s` : `${decade}s`
-    if (!decadeMap[decade]) decadeMap[decade] = { decade, label, count: 0, duration: 0 }
+    if (!decadeMap[decade]) decadeMap[decade] = { decade, label, count: 0, duration: 0, albumCounts: {} }
     decadeMap[decade].count++
     decadeMap[decade].duration += s.duration || 0
+    const aKey = s.albumId || s.album || 'unknown'
+    if (!decadeMap[decade].albumCounts[aKey]) decadeMap[decade].albumCounts[aKey] = { name: s.album || 'Unknown', count: 0 }
+    decadeMap[decade].albumCounts[aKey].count++
   })
-  const decades = Object.values(decadeMap).sort((a, b) => a.decade - b.decade)
+  const decades = Object.values(decadeMap).sort((a, b) => a.decade - b.decade).map(d => ({
+    decade: d.decade, label: d.label, count: d.count, duration: d.duration,
+    topAlbums: Object.values(d.albumCounts).sort((a, b) => b.count - a.count).slice(0, 3),
+  }))
+
+  // ── Years ──────────────────────────────────────────────────────
+  const yearMap = {}
+  songs.forEach(s => {
+    if (!s.year || s.year <= 0) return
+    const y = s.year
+    if (!yearMap[y]) yearMap[y] = { year: y, label: String(y), count: 0, duration: 0, albumCounts: {} }
+    yearMap[y].count++
+    yearMap[y].duration += s.duration || 0
+    const aKey = s.albumId || s.album || 'unknown'
+    if (!yearMap[y].albumCounts[aKey]) yearMap[y].albumCounts[aKey] = { name: s.album || 'Unknown', count: 0 }
+    yearMap[y].albumCounts[aKey].count++
+  })
+  const years = Object.values(yearMap).sort((a, b) => a.year - b.year).map(y => ({
+    year: y.year, label: y.label, count: y.count, duration: y.duration,
+    topAlbums: Object.values(y.albumCounts).sort((a, b) => b.count - a.count).slice(0, 3),
+  }))
 
   // ── Sessions ────────────────────────────────────────────────────
   // A session is a continuous block of listening; a gap > 20 min = new session.
@@ -248,7 +271,7 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
   if (cur) sessionList.push(cur)
   const sessions = sessionList.sort((a, b) => b.duration - a.duration)
 
-  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades, sessions }
+  return { totalDuration, songCount: songs.length, topTimes, genres, topArtists, topAlbums, recentTracks, topTracks, decades, years, sessions }
 }
 
 // span: { days: number, startDate?: Date, endDate?: Date }

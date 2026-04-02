@@ -10,6 +10,7 @@ import TopTracks from './TopTracks'
 import TopDecades from './TopDecades'
 import ThemeSelector from './ThemeSelector'
 import TopSessions from './TopSessions'
+import AlbumsByRelease from './AlbumsByRelease'
 import { useStats } from '../hooks/useStats'
 import { useConfig } from '../hooks/useConfig'
 import { useThemeContext } from '../ThemeContext'
@@ -98,6 +99,10 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
             </div>
             <div className="col-6">
               <TopDecades decades={data.decades} chartColors={theme.chart} />
+            </div>
+
+            <div className="col-12">
+              <AlbumsByRelease decades={data.decades} years={data.years} chartColors={theme.chart} />
             </div>
 
             <div className="col-6">
