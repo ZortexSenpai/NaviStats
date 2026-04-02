@@ -6,6 +6,7 @@ const PRESETS = [
   { label: '7d',  days: 7 },
   { label: '30d', days: 30 },
   { label: '1y',  days: 365 },
+  { label: 'All', days: null },
 ]
 
 function toInputValue(date) {
@@ -55,7 +56,7 @@ export default function SpanPicker({ span, onChange }) {
         <button
           key={p.days}
           className={`span-chip${!isCustom && span.days === p.days ? ' active' : ''}`}
-          onClick={() => { setShowCustom(false); onChange({ days: p.days }) }}
+          onClick={() => { setShowCustom(false); onChange({ days: p.days, all: p.days === null }) }}
         >
           {p.label}
         </button>

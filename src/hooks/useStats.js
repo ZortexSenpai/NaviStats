@@ -280,24 +280,25 @@ export function useStats(auth, span, genreGroups = {}, timezone = null, recentTr
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     if (!auth || !span) return
+    if (!silent) setRaw(null)
     setLoading(true)
     setError(null)
     try {
       const endDate = span.endDate ?? new Date()
-      const startDate = span.startDate ?? subDays(endDate, span.days)
+      const startDate = span.all ? new Date(0) : (span.startDate ?? subDays(endDate, span.days))
       const songs = await fetchSongsInRange(auth.serverUrl, auth.token, startDate)
       // fetchSongsInRange stops at startDate but doesn't skip songs after endDate.
       // For custom ranges (endDate in the past) we must filter the leading songs out.
       const filtered = songs.filter(s => new Date(s.playDate) <= endDate)
-      setRaw({ songs: filtered, startDate, endDate, days: span.days })
+      setRaw({ songs: filtered, startDate, endDate, days: span.all ? Infinity : span.days })
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [auth, span?.days, span?.startDate, span?.endDate])
+  }, [auth, span?.days, span?.all, span?.startDate, span?.endDate])
 
   useEffect(() => { load() }, [load])
 
@@ -307,5 +308,5 @@ export function useStats(auth, span, genreGroups = {}, timezone = null, recentTr
     return processStats(raw.songs, raw.startDate, raw.endDate, raw.days, genreGroups, timezone, recentTracksGenreGrouping)
   }, [raw, genreGroups, timezone, recentTracksGenreGrouping])
 
-  return { data, loading, error, refetch: load }
+  return { data, loading, error, refetch: () => load(true) }
 }
