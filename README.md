@@ -98,6 +98,7 @@ NaviStats reads an optional `public/config.json` at startup. When running via Do
 | `defaultTimespan` | number | `30` | Initial timespan in days shown on load |
 | `defaultTheme` | string | `"navistats"` | Initial theme for new visitors (overridden by user's saved preference) |
 | `timezone` | string | `null` | IANA timezone for all date grouping (e.g. `"Europe/Amsterdam"`). `null` uses the browser's local timezone |
+| `recentTracksRefreshInterval` | number\|null | `null` | Auto-refresh interval in seconds (e.g. `30`). `null` disables auto-refresh |
 | `genreGroups` | object | `{}` | Map of group name → array of sub-genre strings |
 
 Available theme IDs: `navistats`, `catppuccin-mocha`, `catppuccin-latte`, `dracula`, `nord`, `gruvbox`, `tokyo-night`, `one-dark`, `material-dark`

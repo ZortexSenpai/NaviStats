@@ -27,6 +27,13 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
   const { data, loading, error, refetch } = useStats(auth, span, config.genreGroups, config.timezone)
   const theme = useThemeContext()
 
+  useEffect(() => {
+    const interval = config.recentTracksRefreshInterval
+    if (!interval || interval <= 0) return
+    const id = setInterval(refetch, interval * 1000)
+    return () => clearInterval(id)
+  }, [config.recentTracksRefreshInterval, refetch])
+
   return (
     <div className="dashboard">
       <header className="header">
@@ -48,7 +55,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       <main className="main-content">
         {span && <SpanPicker span={span} onChange={setSpan} />}
 
-        {loading && (
+        {loading && !data && (
           <div className="loading-overlay">
             <div className="spinner" />
             <span>Fetching your listening data…</span>
@@ -63,7 +70,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
           </div>
         )}
 
-        {data && !loading && (
+        {data && (
           <div className="stats-grid">
             <div className="col-6">
               <RecentlyListened data={data} />

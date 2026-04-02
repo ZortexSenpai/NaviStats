@@ -2,6 +2,7 @@
   "defaultTimespan": 7,
   "defaultTheme": "navistats",
   "timezone": "Europe/Zurich",
+  "recentTracksRefreshInterval": 20,
   "genreGroups": {
     "Drum and Bass": [
       "Athmostic DNB",
