@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { format, startOfWeek } from 'date-fns'
 import { fetchSongsInRange } from '../api/navidrome'
 
 function inTZ(date, tz) {
@@ -14,7 +15,8 @@ function inTZ(date, tz) {
 }
 
 function processSpecial(songs, timezone) {
-  if (!songs.length) return { onThisDay: [], artistLoyalty: [] }
+  const emptyPace = { day: [], week: [], month: [], year: [] }
+  if (!songs.length) return { onThisDay: [], artistLoyalty: [], pace: emptyPace }
 
   const now = inTZ(new Date(), timezone)
   const todayMonth = now.getMonth()
@@ -44,7 +46,7 @@ function processSpecial(songs, timezone) {
 
   // ── Artist Loyalty ───────────────────────────────────────────────
   const validSongs = songs.filter(s => new Date(s.playDate).getFullYear() > 1970)
-  if (validSongs.length === 0) return { onThisDay, artistLoyalty: [] }
+  if (validSongs.length === 0) return { onThisDay, artistLoyalty: [], pace: emptyPace }
 
   let minTime = Infinity, maxTime = -Infinity
   validSongs.forEach(s => {
@@ -94,7 +96,98 @@ function processSpecial(songs, timezone) {
     .sort((a, b) => b.score - a.score || b.playCount - a.playCount)
     .slice(0, 100)
 
-  return { onThisDay, artistLoyalty }
+  // ── Listening Pace ───────────────────────────────────────────────
+  // Use calendar arithmetic (new Date(y, m, d ± n)) throughout so that DST
+  // transitions never push a bucket's date components off by one day.
+  const realNow = new Date()
+  const todayTZ = inTZ(realNow, timezone)
+  const ty = todayTZ.getFullYear()
+  const tm = todayTZ.getMonth()
+  const td = todayTZ.getDate()
+
+  // Day: last 180 days (6 months), one bucket per day
+  const DAY_COUNT = 180
+  const dayBuckets = []
+  for (let i = DAY_COUNT - 1; i >= 0; i--) {
+    const d = new Date(ty, tm, td - i)
+    dayBuckets.push({ key: `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`, label: format(d, 'MMM d'), count: 0, duration: 0 })
+  }
+  const dayMap = Object.fromEntries(dayBuckets.map(b => [b.key, b]))
+  const dayStartMs = new Date(ty, tm, td - (DAY_COUNT - 1)).getTime()
+  songs.forEach(s => {
+    if (new Date(s.playDate).getTime() < dayStartMs) return
+    const d = inTZ(new Date(s.playDate), timezone)
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+    if (dayMap[key]) { dayMap[key].count++; dayMap[key].duration += s.duration || 0 }
+  })
+
+  // Week: last 52 weeks (1 year), one bucket per week (Mon–Sun)
+  // startOfWeek on the tz-shifted today gives us the correct Monday date components.
+  const WEEK_COUNT = 52
+  const cwStart = startOfWeek(new Date(ty, tm, td), { weekStartsOn: 1 })
+  const cwy = cwStart.getFullYear(), cwm = cwStart.getMonth(), cwd = cwStart.getDate()
+  const weekBuckets = []
+  for (let i = WEEK_COUNT - 1; i >= 0; i--) {
+    const ws = new Date(cwy, cwm, cwd - i * 7)
+    weekBuckets.push({ key: `${ws.getFullYear()}-${ws.getMonth()}-${ws.getDate()}`, label: format(ws, 'MMM d'), count: 0, duration: 0 })
+  }
+  const weekMap = Object.fromEntries(weekBuckets.map(b => [b.key, b]))
+  const weekStartMs = new Date(cwy, cwm, cwd - (WEEK_COUNT - 1) * 7).getTime()
+  songs.forEach(s => {
+    if (new Date(s.playDate).getTime() < weekStartMs) return
+    const d = inTZ(new Date(s.playDate), timezone)
+    // startOfWeek on the tz-shifted date gives correct Mon date components
+    const ws = startOfWeek(new Date(d.getFullYear(), d.getMonth(), d.getDate()), { weekStartsOn: 1 })
+    const key = `${ws.getFullYear()}-${ws.getMonth()}-${ws.getDate()}`
+    if (weekMap[key]) { weekMap[key].count++; weekMap[key].duration += s.duration || 0 }
+  })
+
+  // Month: last 36 months, one bucket per month
+  const monthBuckets = []
+  for (let i = 35; i >= 0; i--) {
+    let m = realNow.getMonth() - i
+    let y = realNow.getFullYear()
+    while (m < 0) { m += 12; y-- }
+    monthBuckets.push({ key: `${y}-${m}`, label: format(new Date(y, m, 1), 'MMM yyyy'), count: 0, duration: 0 })
+  }
+  const monthMap = Object.fromEntries(monthBuckets.map(b => [b.key, b]))
+  const month36Start = new Date(realNow.getFullYear() - 3, realNow.getMonth(), 1).getTime()
+  songs.forEach(s => {
+    if (new Date(s.playDate).getTime() < month36Start) return
+    const d = inTZ(new Date(s.playDate), timezone)
+    const key = `${d.getFullYear()}-${d.getMonth()}`
+    if (monthMap[key]) { monthMap[key].count++; monthMap[key].duration += s.duration || 0 }
+  })
+
+  // Year: full span, one bucket per calendar year
+  const yearMap = {}
+  songs.forEach(s => {
+    const d = inTZ(new Date(s.playDate), timezone)
+    const y = d.getFullYear()
+    if (y <= 1970) return
+    const key = String(y)
+    if (!yearMap[key]) yearMap[key] = { key, label: key, year: y, count: 0, duration: 0 }
+    yearMap[key].count++
+    yearMap[key].duration += s.duration || 0
+  })
+  const yearBuckets = Object.values(yearMap).sort((a, b) => a.year - b.year)
+
+  function trimZeros(buckets) {
+    const first = buckets.findIndex(b => b.count > 0)
+    if (first === -1) return []
+    let last = buckets.length - 1
+    while (last > first && buckets[last].count === 0) last--
+    return buckets.slice(first, last + 1)
+  }
+
+  const pace = {
+    day: trimZeros(dayBuckets),
+    week: trimZeros(weekBuckets),
+    month: trimZeros(monthBuckets),
+    year: yearBuckets,
+  }
+
+  return { onThisDay, artistLoyalty, pace }
 }
 
 export function useSpecialStats(auth, timezone = null) {
