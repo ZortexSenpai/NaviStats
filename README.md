@@ -58,28 +58,33 @@ Open [http://localhost:5173](http://localhost:5173), enter your Navidrome server
 
 **Requirements:** Docker
 
+Create a `docker-compose.yml` file:
+
+```yaml
+services:
+  navistats:
+    container_name: navistats
+    image: ghcr.io/zortexsenpai/navistats:latest
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/usr/share/nginx/html/config.json:ro
+```
+
+Then start it:
+
 ```bash
-git clone https://github.com/ZortexSenpai/NaviStats
-cd NaviStats
 docker compose up -d
 ```
 
 NaviStats will be available at [http://localhost:3000](http://localhost:3000).
 
-To use a custom `config.json` (see [Configuration](#configuration) below), uncomment the `volumes` block in `docker-compose.yml`:
-
-```yaml
-volumes:
-  - ./config.json:/usr/share/nginx/html/config.json:ro
-```
-
-Then place your `config.json` next to `docker-compose.yml` and restart the container:
+The `config.json` volume is optional — only needed if you want to customise genre groupings or other settings (see [Configuration](#configuration) below). If you mount one, place it next to your `docker-compose.yml` and restart the container after any changes:
 
 ```bash
 docker compose restart
 ```
-
-No rebuild is needed — the config file is fetched at runtime.
 
 ---
 
