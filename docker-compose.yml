@@ -1,0 +1,25 @@
+services:
+  navistats:
+    container_name: navistats
+    build: .
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    # Mount a custom config.json to override genre groups (and future settings).
+    # The file is fetched at runtime, so no rebuild needed after changes.
+    # volumes:
+    #   - ./config.json:/usr/share/nginx/html/config.json:ro
+    
+    # Add these labels if you plan to use Traefik as the 
+    #labels:
+    #  - "traefik.enable=true"
+    #  - "traefik.http.routers.navistats.rule=Host(`navistats.example.com`)"
+    #  - "traefik.http.routers.navistats.entrypoints=websecure"
+    #  - "traefik.http.routers.navistats.tls.certresolver=letsencrypt"
+    #  - "traefik.http.services.navistats.loadbalancer.server.port=80"
+    #networks:
+    #  - frontend
+
+#networks:
+#  frontend:
+#    external: true
