@@ -30,7 +30,8 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 
 ---
 
-## Screenshots
+## Example Screenshots
+Note: this project is currently in development so the screenshots will not include all features
 <img width="2252" height="1318" alt="image" src="https://github.com/user-attachments/assets/75b1c0e3-d7d2-488d-964d-c6cbb1533fd1" />
 <img width="2252" height="831" alt="image" src="https://github.com/user-attachments/assets/28c112fc-3bac-4fb8-8ea3-2ec06eec5668" />
 <img width="2252" height="907" alt="image" src="https://github.com/user-attachments/assets/ea8d2be0-eaa6-4ccf-862e-64701c3decd1" />

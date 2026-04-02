@@ -235,6 +235,34 @@ body {
   color: var(--accent);
 }
 
+.header-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-tab:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.nav-tab.active {
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -862,6 +890,100 @@ body {
   font-weight: 600;
   color: var(--accent);
   white-space: nowrap;
+}
+
+/* ─── Modal ──────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 440px;
+  width: 100%;
+  padding: 28px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.modal-body strong {
+  color: var(--text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ─── On This Day ────────────────────────────────── */
+
+.otd-years {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.otd-year {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.otd-year-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.otd-year-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.otd-year-ago {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.otd-year-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.otd-more {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 0 2px;
+  text-align: center;
 }
 
 /* ─── Responsive ─────────────────────────────────── */
