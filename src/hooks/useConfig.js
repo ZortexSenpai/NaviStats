@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const DEFAULT_CONFIG = { genreGroups: {}, defaultTheme: null, timezone: null, recentTracksRefreshInterval: null }
+const DEFAULT_CONFIG = { genreGroups: {}, defaultTheme: null, timezone: null, recentTracksRefreshInterval: null, recentTracksGenreGrouping: true }
 
 export function useConfig() {
   const [config, setConfig] = useState(DEFAULT_CONFIG)

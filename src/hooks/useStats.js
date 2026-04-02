@@ -41,7 +41,7 @@ function inTZ(date, tz) {
   return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
 }
 
-function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null) {
+function processStats(songs, startDate, endDate, timespanDays, genreGroups = {}, timezone = null, recentTracksGenreGrouping = true) {
   if (!songs.length) {
     return { totalDuration: 0, songCount: 0, topTimes: [], genres: [], topArtists: [], topAlbums: [], recentTracks: [], sessions: [] }
   }
@@ -190,6 +190,7 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
     albumId: s.albumId,
     playDate: s.playDate,
     duration: s.duration || 0,
+    genres: [...new Set(songGenres(s, recentTracksGenreGrouping ? genreGroupMap : {}))],
   }))
 
   // ── Top Tracks ─────────────────────────────────────────────────
@@ -251,7 +252,7 @@ function processStats(songs, startDate, endDate, timespanDays, genreGroups = {},
 }
 
 // span: { days: number, startDate?: Date, endDate?: Date }
-export function useStats(auth, span, genreGroups = {}, timezone = null) {
+export function useStats(auth, span, genreGroups = {}, timezone = null, recentTracksGenreGrouping = true) {
   const [raw, setRaw] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -280,8 +281,8 @@ export function useStats(auth, span, genreGroups = {}, timezone = null) {
   // Re-process whenever raw data or genre groups change — no extra fetch needed
   const data = useMemo(() => {
     if (!raw) return null
-    return processStats(raw.songs, raw.startDate, raw.endDate, raw.days, genreGroups, timezone)
-  }, [raw, genreGroups, timezone])
+    return processStats(raw.songs, raw.startDate, raw.endDate, raw.days, genreGroups, timezone, recentTracksGenreGrouping)
+  }, [raw, genreGroups, timezone, recentTracksGenreGrouping])
 
   return { data, loading, error, refetch: load }
 }

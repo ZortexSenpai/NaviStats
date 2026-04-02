@@ -24,7 +24,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       setSpan({ days: config.defaultTimespan || 30 })
     }
   }, [config.loaded])
-  const { data, loading, error, refetch } = useStats(auth, span, config.genreGroups, config.timezone)
+  const { data, loading, error, refetch } = useStats(auth, span, config.genreGroups, config.timezone, config.recentTracksGenreGrouping)
   const theme = useThemeContext()
 
   useEffect(() => {

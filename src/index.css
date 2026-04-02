@@ -789,6 +789,23 @@ body {
   text-overflow: ellipsis;
 }
 
+.track-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.track-genre-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
 .track-right {
   display: flex;
   flex-direction: column;
