@@ -52,6 +52,27 @@ export async function fetchSongsInRange(serverUrl, token, startDate) {
   return songs
 }
 
+export async function fetchAllLibrarySongs(serverUrl, token) {
+  const base = serverUrl.replace(/\/$/, '')
+  const headers = { 'X-Nd-Authorization': `Bearer ${token}` }
+  const songs = []
+  let offset = 0
+
+  while (true) {
+    const url = `${base}/api/song?_sort=title&_order=ASC&_start=${offset}&_end=${offset + PAGE_SIZE}`
+    const res = await fetch(url, { headers })
+    if (res.status === 401) throw new Error('Session expired. Please log in again.')
+    if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`)
+    const page = await res.json()
+    if (!Array.isArray(page) || page.length === 0) break
+    songs.push(...page)
+    if (page.length < PAGE_SIZE) break
+    offset += PAGE_SIZE
+  }
+
+  return songs
+}
+
 export async function fetchTopTracks(serverUrl, token, limit = 10) {
   const base = serverUrl.replace(/\/$/, '')
   const res = await fetch(
