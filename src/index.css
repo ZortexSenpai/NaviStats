@@ -986,6 +986,140 @@ body {
   text-align: center;
 }
 
+/* ─── Library: Format Distribution ──────────────── */
+
+.format-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.format-table th {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.format-table td {
+  padding: 8px 10px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.format-table tr:last-child td {
+  border-bottom: none;
+}
+
+.format-table td:first-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.format-badge {
+  display: inline-block;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+}
+
+/* ─── Library: Untagged Tracks ───────────────────── */
+
+.untagged-summary {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.untagged-badge {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.untagged-badge strong {
+  color: var(--text-primary);
+  margin-left: 4px;
+}
+
+.untagged-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.untagged-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.untagged-row:last-child {
+  border-bottom: none;
+}
+
+.untagged-track-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.untagged-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.untagged-artist {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.untagged-tags {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tag-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+
+.tag-genre { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+.tag-year  { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+.tag-gain  { background: rgba(124, 111, 247, 0.15); color: var(--accent); }
+
 /* ─── Responsive ─────────────────────────────────── */
 
 /* Tablet landscape: 3-col cards still fit, split TopTracks/RecentTracks */

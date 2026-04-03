@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import SpecialPage from './SpecialPage'
+import LibraryPage from './LibraryPage'
 import SpanPicker from './SpanPicker'
 import RecentlyListened from './RecentlyListened'
 import Timeline from './Timeline'
@@ -19,21 +20,22 @@ import { useThemeContext } from '../ThemeContext'
 export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChange }) {
   const config = useConfig()
   const [page, setPage] = useState('main')
-  const [showWarning, setShowWarning] = useState(false)
+  const [showWarning, setShowWarning] = useState(null) // 'special' | 'library' | null
   const hasConfirmedSpecial = useRef(false)
+  const hasConfirmedLibrary = useRef(false)
 
   function handleSpecialClick() {
-    if (hasConfirmedSpecial.current) {
-      setPage('special')
-    } else {
-      setShowWarning(true)
-    }
+    if (hasConfirmedSpecial.current) { setPage('special') } else { setShowWarning('special') }
+  }
+
+  function handleLibraryClick() {
+    if (hasConfirmedLibrary.current) { setPage('library') } else { setShowWarning('library') }
   }
 
   function handleWarningConfirm() {
-    hasConfirmedSpecial.current = true
-    setShowWarning(false)
-    setPage('special')
+    if (showWarning === 'special') { hasConfirmedSpecial.current = true; setPage('special') }
+    if (showWarning === 'library') { hasConfirmedLibrary.current = true; setPage('library') }
+    setShowWarning(null)
   }
 
   const [span, setSpan] = useState(null)
@@ -64,6 +66,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
         <nav className="header-nav">
           <button className={`nav-tab${page === 'main' ? ' active' : ''}`} onClick={() => setPage('main')}>Dashboard</button>
           <button className={`nav-tab${page === 'special' ? ' active' : ''}`} onClick={handleSpecialClick}>Special</button>
+          <button className={`nav-tab${page === 'library' ? ' active' : ''}`} onClick={handleLibraryClick}>Library</button>
         </nav>
         <div className="header-right">
           <span className="header-user">
@@ -78,6 +81,8 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
 
       {page === 'special'
         ? <SpecialPage auth={auth} config={config} />
+        : page === 'library'
+        ? <LibraryPage auth={auth} />
         : (
           <main className="main-content">
             {span && <SpanPicker span={span} onChange={setSpan} />}
@@ -155,15 +160,19 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       }
 
       {showWarning && (
-        <div className="modal-overlay" onClick={() => setShowWarning(false)}>
+        <div className="modal-overlay" onClick={() => setShowWarning(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">Load Complete History</div>
+            <div className="modal-title">
+              {showWarning === 'library' ? 'Scan Full Library' : 'Load Complete History'}
+            </div>
             <div className="modal-body">
-              The Special page loads your <strong>entire listening history</strong> from Navidrome.
-              Depending on how many tracks you have played, this may take a while.
+              {showWarning === 'library'
+                ? <>The Library page fetches <strong>every track in your Navidrome library</strong>, including tracks you have never played. Depending on library size, this may take a while.</>
+                : <>The Special page loads your <strong>entire listening history</strong> from Navidrome. Depending on how many tracks you have played, this may take a while.</>
+              }
             </div>
             <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setShowWarning(false)}>Cancel</button>
+              <button className="btn btn-ghost" onClick={() => setShowWarning(null)}>Cancel</button>
               <button className="btn btn-primary" style={{ width: 'auto' }} onClick={handleWarningConfirm}>Load anyway</button>
             </div>
           </div>
