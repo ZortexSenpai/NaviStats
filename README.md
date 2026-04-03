@@ -24,6 +24,8 @@ Charts that are **not affected** by this: Unique Tracks, Recent Tracks, Artist L
 
 Once Navidrome exposes a scrobble history endpoint, the charts can be updated to reflect true per-play data.
 
+**I'll try to figure out a way to overcome this limitation**
+
 ---
 
 ## Features
