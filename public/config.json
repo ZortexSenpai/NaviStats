@@ -4,6 +4,7 @@
   "timezone": "Europe/Zurich",
   "recentTracksRefreshInterval": 20,
   "recentTracksGenreGrouping": false,
+  "lowQualityBitrateThreshold": 192,
   "genreGroups": {
     "Drum and Bass": [
       "Athmostic DNB",

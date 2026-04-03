@@ -2,10 +2,12 @@ import { useEffect } from 'react'
 import { useLibraryStats } from '../hooks/useLibraryStats'
 import FormatDistribution from './FormatDistribution'
 import UntaggedTracks from './UntaggedTracks'
+import LowQualityTracks from './LowQualityTracks'
 import { useThemeContext } from '../ThemeContext'
 
-export default function LibraryPage({ auth }) {
-  const { data, loading, error, load } = useLibraryStats(auth)
+export default function LibraryPage({ auth, config }) {
+  const threshold = config?.lowQualityBitrateThreshold ?? 192
+  const { data, loading, error, load } = useLibraryStats(auth, threshold)
   const theme = useThemeContext()
 
   useEffect(() => { load() }, [load])
@@ -31,6 +33,9 @@ export default function LibraryPage({ auth }) {
         <div className="stats-grid">
           <div className="col-12">
             <FormatDistribution data={data} chartColors={theme.chart} />
+          </div>
+          <div className="col-12">
+            <LowQualityTracks data={data} threshold={threshold} />
           </div>
           <div className="col-12">
             <UntaggedTracks data={data} />
