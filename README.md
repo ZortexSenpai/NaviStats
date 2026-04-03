@@ -10,6 +10,22 @@ ZortexSenpai: "I've looked at this part of the code, This is true. You can find 
 
 ---
 
+## ⚠️ API Limitation
+
+The Navidrome API returns **one record per unique song**, containing the song's all-time `playCount` and its most recent `playDate`. It does not expose individual play events or scrobble history (this is being worked on in [navidrome/navidrome#4770](https://github.com/navidrome/navidrome/pull/4770)).
+
+This means:
+
+- **Play counts are all-time totals**, not period-specific. "Top Tracks in the last 7 days" is really "highest all-time play count among songs touched in the last 7 days."
+- **Repeat listens are invisible.** If you played a track 5 times in one day, it counts as 1 play in the timeline and pace charts.
+- **Most charts measure breadth** (how many unique songs/artists/genres you listened to) rather than intensity (how many total times).
+
+Charts that are **not affected** by this: Unique Tracks, Recent Tracks, Artist Loyalty, and BPM Distribution all work correctly with unique song records.
+
+Once Navidrome exposes a scrobble history endpoint, the charts can be updated to reflect true per-play data.
+
+---
+
 ## Features
 ### How many stats do you want? This project: YES
 
