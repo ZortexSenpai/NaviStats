@@ -42,6 +42,7 @@ Accessible via the **Special** tab in the header (loads your complete listening 
 Accessible via the **Library** tab in the header (scans every track in your Navidrome library, including unplayed ones — a one-time confirmation is shown on first visit).
 
 - **Format Distribution** — horizontal bar chart and summary table showing track counts, share, and average bitrate per audio format (FLAC, MP3, AAC, etc.)
+- **Low Quality Tracks** — lossy files (MP3, AAC, OGG, etc.) below a configurable bitrate threshold (default 192 kbps), sorted by bitrate ascending
 - **Untagged / Poorly Tagged** — filterable list of tracks missing genre, release year, or replay gain tags, with per-track badges indicating which tags are absent
 
 ---
@@ -118,6 +119,7 @@ NaviStats reads an optional `public/config.json` at startup. When running via Do
 | `timezone` | string | `null` | IANA timezone for all date grouping (e.g. `"Europe/Amsterdam"`). `null` uses the browser's local timezone |
 | `recentTracksRefreshInterval` | number\|null | `null` | Auto-refresh interval in seconds (e.g. `30`). `null` disables auto-refresh |
 | `recentTracksGenreGrouping` | boolean | `true` | Whether to apply genre grouping to genres shown in Recent Tracks. `false` shows raw genre tags |
+| `lowQualityBitrateThreshold` | number | `192` | Bitrate threshold (kbps) for the Low Quality Tracks tile on the Library page. Only lossy formats (MP3, AAC, OGG, etc.) are checked |
 | `genreGroups` | object | `{}` | Map of group name → array of sub-genre strings |
 
 Available theme IDs: `navistats`, `catppuccin-mocha`, `catppuccin-latte`, `dracula`, `nord`, `gruvbox`, `tokyo-night`, `one-dark`, `material-dark`

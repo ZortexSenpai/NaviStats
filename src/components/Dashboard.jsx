@@ -82,7 +82,7 @@ export default function Dashboard({ auth, onLogout, themes, themeId, onThemeChan
       {page === 'special'
         ? <SpecialPage auth={auth} config={config} />
         : page === 'library'
-        ? <LibraryPage auth={auth} />
+        ? <LibraryPage auth={auth} config={config} />
         : (
           <main className="main-content">
             {span && <SpanPicker span={span} onChange={setSpan} />}
